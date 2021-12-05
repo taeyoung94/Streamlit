@@ -9,7 +9,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import re
+import platform
+import warnings
+import geopandas
+import folium
+from streamlit_folium import folium_static 
+warnings.filterwarnings(action='ignore')
+from matplotlib import font_manager, rc
+plt.rcParams['axes.unicode_minus'] = False
 
+if platform.system() == 'Darwin':
+    rc('font', family='AppleGothic')
+elif platform.system() == 'Windows':
+    path = "c:/Windows/Fonts/malgun.ttf"
+    font_name = font_manager.FontProperties(fname=path).get_name()
+    rc('font', family=font_name)
+else:
+    print('Unknown system.... sorry.....')
 
 # In[21]:
 
@@ -18,14 +35,18 @@ import seaborn as sns
 header = st.container()
 dataset = st.container()
 model_training = st.container()
+result = st.container()
+visual = st.container()
+
+
 
 
 # In[22]:
 
 
 with header:
-    st.title('Modeling_QC!')
-    st.text('In this website Proceeding Quailty Check.')
+    st.title('Golf Modeling Dashboard')
+    st.text('On this website, see the progress of the golf modeling')
 
 
 # In[34]:
@@ -69,8 +90,8 @@ with dataset:
     st.pyplot(g)
 
 with model_training:
-    st.header('Time to train the model!')
-    st.text('here you get to choose the features of the model and will see how the performance change')
+    st.header('Time to train the model.')
+
         
     sel_col, disp_col = st.columns(2)
         
@@ -112,7 +133,34 @@ with model_training:
     disp_col.subheader('R_square of the model is:')
     disp_col.write(results.rsquared)
     
-    
+
+with result:
+    df = pd.read_excel('골프장_유사거래=3.xlsx')
+    st.dataframe(df)
+
+with visual:
+    pg = pd.read_csv('pg.csv',encoding='cp949')
+    pg['poly'] = geopandas.GeoSeries.from_wkt(pg['poly'])
+    pg = geopandas.GeoDataFrame(pg, geometry='poly')
+    pg = pg.set_crs(4326, allow_override = True)
+
+    pg_geo = pg[['poly']]
+
+    my_map = folium.Map(location = [36.615734, 128.098236], zoom_start = 9)
+folium.Choropleth(
+    geo_data = pg,
+    name = 'choropleth',
+    data = pg,
+    columns = ['name', 'area'],
+    fill_color = 'YlGnBu',
+    fill_opacity=0.7,
+    line_opacity=0.2
+    ).add_to(my_map)
+
+st.header('Map of Golf')
+folium_static(my_map)
+
+
 
                                            
 

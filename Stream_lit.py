@@ -54,7 +54,7 @@ with header:
 
 with dataset:
     st.header('Golf Modeling')
-    
+    st.text('It shows train features.')
     golf_data = pd.read_csv('st_golf_macro.csv', encoding='cp949')
     st.write(golf_data.head())
     
@@ -103,10 +103,11 @@ with model_training:
 #    X = golf_data[[input_feature]]
 #    y = golf_data[['log_pv']]
     
-    from sklearn.linear_model import LinearRegression
+
     from sklearn.metrics import median_absolute_error as mdape
     from sklearn.metrics import mean_absolute_error as mae
     import statsmodels.formula.api as smf
+    import geopandas
     
     # 설명변수
     X = golf_data.drop(['log_pv'], axis=1)
@@ -146,7 +147,7 @@ with visual:
 
     pg_geo = pg[['poly']]
 
-    my_map = folium.Map(location = [36.615734, 128.098236], zoom_start = 9)
+    my_map = folium.Map(location = [36.715734, 128.098236], zoom_start = 9)
 folium.Choropleth(
     geo_data = pg,
     name = 'choropleth',

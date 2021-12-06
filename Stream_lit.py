@@ -3,7 +3,6 @@
 
 # In[32]:
 
-pip install geopandas
 
 import streamlit as st
 import pandas as pd

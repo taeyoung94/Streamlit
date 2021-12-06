@@ -3,6 +3,7 @@
 
 # In[32]:
 
+pip install geopandas
 
 import streamlit as st
 import pandas as pd
@@ -14,6 +15,7 @@ import platform
 import warnings
 import geopandas
 import folium
+from folium.plugins import MarkerCluster
 from sklearn.metrics import median_absolute_error as mdape
 from sklearn.metrics import mean_absolute_error as mae
 import statsmodels.formula.api as smf
@@ -136,7 +138,7 @@ with model_training:
     
 
 with result:
-    df = pd.read_excel('골프장_유사거래=3.xlsx')
+    df = pd.read_excel('골프장_유사거래=3.xlsx')
     st.dataframe(df)
 
 with visual:
@@ -148,7 +150,7 @@ with visual:
     pg_geo = pg[['poly']]
 
     my_map = folium.Map(location = [36.715734, 128.098236], zoom_start = 9)
-folium.Choropleth(
+    folium.Choropleth(
     geo_data = pg,
     name = 'choropleth',
     data = pg,
@@ -158,8 +160,26 @@ folium.Choropleth(
     line_opacity=0.2
     ).add_to(my_map)
 
-st.header('Map of Golf')
-folium_static(my_map)
+
+    lat = pd.read_csv('cbm_train_LATLNG.csv', encoding='cp949', index_col=0)
+    lat = lat[['pnu', 'Address', 'LAT', 'LNG']]
+    lat["loc"] = list(zip(lat["LAT"], lat["LNG"]))
+    lat = lat.replace(r'[<()]', '', regex=True)
+
+    df = pd.merge(pg, lat, how='left', on ='Address')
+
+
+    marker_cluster = MarkerCluster().add_to(my_map)
+
+    for i in range(len(pg)):
+        folium.Marker(
+        location = df['loc'][i],
+        popup= df['name'][i],
+        icon = folium.Icon(color='red', icon='ok')
+        ).add_to(marker_cluster)
+
+    st.header('Map of Golf')
+    folium_static(my_map)
 
 
 

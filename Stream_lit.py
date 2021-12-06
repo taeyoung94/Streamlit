@@ -14,6 +14,9 @@ import platform
 import warnings
 import geopandas
 import folium
+from sklearn.metrics import median_absolute_error as mdape
+from sklearn.metrics import mean_absolute_error as mae
+import statsmodels.formula.api as smf
 from streamlit_folium import folium_static 
 warnings.filterwarnings(action='ignore')
 from matplotlib import font_manager, rc
@@ -104,10 +107,7 @@ with model_training:
 #    y = golf_data[['log_pv']]
     
 
-    from sklearn.metrics import median_absolute_error as mdape
-    from sklearn.metrics import mean_absolute_error as mae
-    import statsmodels.formula.api as smf
-    import geopandas
+
     
     # 설명변수
     X = golf_data.drop(['log_pv'], axis=1)
